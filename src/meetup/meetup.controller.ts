@@ -12,27 +12,27 @@ export class MeetUpController {
   constructor(private readonly MeetUpService: MeetUpService) {}
 
 
-  @Roles('user', 'admin') 
+  @Roles('NORMAL', 'admin') 
   @Post()
   create(@Body() createMeetupDto: CreateMeetUpDto) {
     return this.MeetUpService.create(createMeetupDto);
   }
-  @Roles('user', 'admin') 
+  @Roles('NORMAL', 'admin') 
   @Get()
   findAll() {
     return this.MeetUpService.findAll();
   }
-
+  @Roles('NORMAL', 'admin') 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.MeetUpService.findOne(id);
   }
- 
+  @Roles('NORMAL', 'admin') 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateMeetupDto) {
     return this.MeetUpService.update(id, updateUserDto);
   }
-
+  @Roles('NORMAL', 'admin') 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.MeetUpService.remove(id);

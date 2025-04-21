@@ -1,4 +1,4 @@
-
+//auth.service.ts
 import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -15,30 +15,38 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async register(dto: RegisterDto) {
-    const existing = await this.userModel.findOne({ email: dto.email });
-    if (existing) throw new BadRequestException('User already exists');
+async register(dto: RegisterDto) {
+  const existing = await this.userModel.findOne({ PARTNER_NUMBER: dto.PARTNER_NUMBER });
+  if (existing) throw new BadRequestException('User already exists');
+  const passwordToHash = dto.PASSWORD ?? '12345678';
+  const hash = await bcrypt.hash(passwordToHash, 10);
 
-    const hash = await bcrypt.hash(dto.password, 10);
-    const user = new this.userModel({ ...dto, password: hash });
-    await user.save();
+  const user = new this.userModel({
+    ...dto,
+    PASSWORD: hash,
+    PARTNER_CREATE_DATE: new Date(),
+    PARTNER_UPDATE_DATE: new Date(),
+  });
 
-    return { message: 'Registered successfully' };
-  }
+  await user.save();
 
-  async login(dto: LoginDto) {
-    const user = await this.userModel.findOne({ email: dto.email });
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+  return { message: 'Registered successfully' };
+}
 
-    const match = await bcrypt.compare(dto.password, user.password);
-    if (!match) throw new UnauthorizedException('Invalid credentials');
+async login(dto: LoginDto) {
+  const user = await this.userModel.findOne({ PARTNER_NUMBER: dto.PARTNER_NUMBER });
+  if (!user) throw new UnauthorizedException('Invalid credentials');
 
-    const payload = { sub: user._id, role: user.role };
-    const token = this.jwtService.sign(payload);
+  const match = await bcrypt.compare(dto.PASSWORD, user.PASSWORD);
+  if (!match) throw new UnauthorizedException('Invalid credentials');
 
-    return {
-      message: 'Login successful',
-      token,
-    };
-  }
+  const payload = { sub: user._id, role: user.PARTNER_USER_TYPE };
+  const token = this.jwtService.sign(payload);
+
+  return {
+    message: 'Login successful',
+    token,
+  };
+}
+
 }

@@ -8,6 +8,8 @@ import { AppService } from './app.service';
 import { MeetupModule } from './meetup/meetup.module';
 import { AuthModule } from './auth/auth.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ConnectModule } from './connect/connect.module';
+import { AppreciationModule } from './appreciation/appreciation.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
     }),
     MeetupModule,
     AuthModule,
+    ConnectModule,
+    AppreciationModule,
   ],
   controllers: [AppController],
   providers: [
